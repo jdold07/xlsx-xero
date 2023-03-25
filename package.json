@@ -1,0 +1,45 @@
+{
+  "name": "xlsx-xero",
+  "version": "0.1.1",
+  "license": "MIT",
+  "author": {
+    "name": "tpsTech.dev",
+    "url": "https://tpsTech.dev",
+    "email": "jdold07@tpstech.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jdold07/xlsx-xero"
+  },
+  "description": "A Node utility to import Excel (xls or xlsx) invoice summary data to Xero as Invoices.  Parses Excel (xls or xlsx) workbook data and generates an \"Invoices\" and a \"CreditNotes\" data object and sends the generated \"Invoices\" and/or \"CreditNotes\" object/s to Xero via the Xero api.",
+  "main": "src/main.ts",
+  "types": "src/types.d.ts",
+  "scripts": {
+    "auth-new-tenant": "ts-node src/newAuth.ts",
+    "import-dd-xero-pw": "ts-node src/main.ts pw",
+    "import-dd-xero-wb": "ts-node src/main.ts wb"
+  },
+  "keywords": [
+    "Xero",
+    "Excel",
+    "Invoice",
+    "Import",
+    "POS",
+    "Sale"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.35.0",
+    "standard-version": "^9.5.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.11.0",
+    "open": "^8.4.2",
+    "xero-node": "^4.33.0",
+    "xlsx": "file:../../vendor/xlsx-0.19.1.tgz"
+  },
+  "prisma": {
+    "schema": "../../prisma/schema.prisma"
+  }
+}
