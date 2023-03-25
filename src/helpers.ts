@@ -94,8 +94,8 @@ export async function writeTokenSetJson(
     writeFileSync(jsonPath, JSON.stringify(tokenSet, null, 2))
     return true
   } catch (error: any) {
-    console.error(error?.message ?? error)
-    throw new Error(error?.message ?? error)
+    console.error(JSON.stringify(error?.message ?? error, null, 2))
+    throw new Error(JSON.stringify(error?.message ?? error, null, 2))
   }
 }
 
