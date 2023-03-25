@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "strict": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "CommonJS",
+    "allowJs": true,
+    "checkJs": false,
+    "sourceMap": false,
+    "removeComments": true,
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "outDir": "./dist/"
+  },
+  "typeAcquisition": {
+    "enable": true
+  },
+  "include": ["./src/**/*"]
+}
