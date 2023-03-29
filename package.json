@@ -28,14 +28,14 @@
     "Sale"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.54.1",
-    "@typescript-eslint/parser": "^5.54.1",
-    "eslint": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint": "^8.37.0",
     "standard-version": "^9.5.0"
   },
   "dependencies": {
-    "@prisma/client": "^4.11.0",
-    "open": "^8.4.2",
+    "@prisma/client": "^4.12.0",
+    "open": "^9.1.0",
     "xero-node": "^4.33.0",
     "xlsx": "file:../../vendor/xlsx-0.19.1.tgz"
   },
