@@ -7,25 +7,30 @@ import storedToken from "./resources/tokenSet.json"
 main(process.argv[2])
 
 async function main(entity: string) {
-  const logPath = getLogPath(entity)
-  const tenantIndex = getTenantIndex(entity)
+  try {
+    const logPath = getLogPath(entity)
+    const tenantIndex = getTenantIndex(entity)
 
-  let xero = new XeroClient()
-  const tokenSet: TokenSet = new TokenSet(storedToken)
+    let xero = new XeroClient()
+    const tokenSet: TokenSet = new TokenSet(storedToken)
 
-  xero = await refreshTokenSet(tokenSet)
-  const activeTenantId = await setActiveTenant(tenantIndex, xero)
+    xero = await refreshTokenSet(tokenSet)
+    const activeTenantId = await setActiveTenant(tenantIndex, xero)
 
-  const { invoices, credits } = await createXeroDataObject(logPath)
-  console.log("Xero Invoice Objects created")
+    const { invoices, credits } = await createXeroDataObject(logPath)
+    console.log("Xero Invoice Objects created")
 
-  const { invRes, crRes } = await sendInvOrCRToXero(invoices, credits, xero, activeTenantId)
-  console.log("Xero Invoice Objects sent to Xero API")
+    const { invRes, crRes } = await sendInvOrCRToXero(invoices, credits, xero, activeTenantId)
+    console.log("Xero Invoice Objects sent to Xero API")
 
-  //TODO - add error checking & logging on Xero response
+    //TODO - add error checking & logging on Xero response
 
-  writeResponseLog(invRes, crRes, logPath)
-  console.log("Invoices have been sent to Xero.")
-  process.exitCode = 0
-  return
+    writeResponseLog(invRes, crRes, logPath)
+    console.log("Invoices have been sent to Xero.")
+    process.exitCode = 0
+    return
+  } catch (err) {
+    console.log(err)
+    process.exitCode = 1
+  }
 }
