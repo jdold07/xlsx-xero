@@ -19,7 +19,8 @@
     "import-dd-xero-pw": "ts-node src/main.ts pw",
     "import-dd-xero-wb": "ts-node src/main.ts wb",
     "update-coa-xero-pw": "ts-node src/updateCoa.ts pw",
-    "update-coa-xero-wb": "ts-node src/updateCoa.ts wb"
+    "update-coa-xero-wb": "ts-node src/updateCoa.ts wb",
+    "release": "standard-version"
   },
   "keywords": [
     "Xero",
