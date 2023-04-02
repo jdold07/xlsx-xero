@@ -17,7 +17,9 @@
   "scripts": {
     "auth-new-tenant": "ts-node src/newAuth.ts",
     "import-dd-xero-pw": "ts-node src/main.ts pw",
-    "import-dd-xero-wb": "ts-node src/main.ts wb"
+    "import-dd-xero-wb": "ts-node src/main.ts wb",
+    "update-coa-xero-pw": "ts-node src/updateCoa.ts pw",
+    "update-coa-xero-wb": "ts-node src/updateCoa.ts wb"
   },
   "keywords": [
     "Xero",
