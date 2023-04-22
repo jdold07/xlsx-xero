@@ -112,7 +112,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
   const deli = data.deptSales.find((d) => d.department.deptDisplayName === "Deli")
   const bakery = data.deptSales.find((d) => d.department.deptDisplayName === "Bakery")
   const meat = data.deptSales.find((d) => d.department.deptDisplayName === "Meat")
-  const takeaway = data.deptSales.find((d) => d.department.deptDisplayName === "Takeaway")
+  const takeaway = data.deptSales.find((d) => d.department.deptDisplayName === "Take-away")
   const cigs = data.deptSales.find((d) => d.department.deptDisplayName === "Cigarettes & Tobacco")
   const depts = [produce, deli, bakery, meat, takeaway, cigs]
   const deptsToInclude = depts.filter((d) => d !== undefined)
@@ -184,8 +184,8 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: +(data.storeExp.totalExp ?? 0) * -1,
         taxAmount: 0,
-        accountCode: "51000",
-        taxType: "EXEMPTINPUT",
+        accountCode: process.argv[2] === "wb" ? "51040" : "51015",
+        taxType: "EXEMPTEXPENSES",
       },
     ],
   }
