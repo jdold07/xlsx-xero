@@ -49,7 +49,7 @@ export type ParsedXlsxData = {
 export type ValidTokenSet = Omit<TokenSet, keyof "expired" & keyof "claims">
 
 /** Declaration of Xero storedTokenSet JSON module for saving current tokenSet data*/
-declare module "resources/xeroTokenSet.json" {
+declare module "resources/tokenSet.json" {
   const tokenSet: ValidTokenSet
   export default tokenSet
 }

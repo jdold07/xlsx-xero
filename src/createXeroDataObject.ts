@@ -26,7 +26,7 @@ export async function createXeroDataObject(logPath: string) {
 
       // Set variables for the invoice object
       const ref = `${txn.terminalId}/${txn.seqNo}`
-      const glCode = txn.customerId === "45678" ? "41145" : "41100"
+      const glCode = txn.customerId === "45678" ? "42100" : "41000"
       const desc = `${
         txn.notes ?? "Customer POS Account Sale"
       }: \n* POS ID: ${ref}\n* Timestamp: ${new Date(
@@ -121,7 +121,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
     quantity: 1,
     unitAmount: +(d?.sellEx ?? 0),
     taxAmount: 0,
-    accountCode: d?.department.glCodeSales ?? "41100",
+    accountCode: d?.department.glCodeSales ?? "41000",
     taxType: "EXEMPTOUTPUT",
   }))
   const freSales =
@@ -152,7 +152,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: gstSales,
         taxAmount: +data.totalGst ?? 0,
-        accountCode: "41100",
+        accountCode: "41000",
         taxType: "OUTPUT",
       },
       {
@@ -160,7 +160,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: freSales,
         taxAmount: 0,
-        accountCode: "41100",
+        accountCode: "41000",
         taxType: "EXEMPTOUTPUT",
       },
       ...deptSalesLineItems,
@@ -169,7 +169,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: rounding,
         taxAmount: 0,
-        accountCode: "63400",
+        accountCode: "62650",
         taxType: "BASEXCLUDED",
       },
       {
@@ -177,7 +177,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: tillVariance ?? 0,
         taxAmount: 0,
-        accountCode: "63400",
+        accountCode: "62650",
         taxType: "BASEXCLUDED",
       },
       {
