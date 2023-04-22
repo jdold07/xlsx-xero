@@ -128,7 +128,8 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
     +data.totalSales -
     deptsToInclude.reduce((a, c) => a + +(c?.sellEx ?? 0), 0) -
     gstSales -
-    (+data.totalAccountSales - data.storeExp.totalExp)
+    (+data.totalAccountSales - data.storeExp.totalExp) -
+    data.totalOtherPayments
   const rounding = +(data.totalRounding ?? 0) * -1
 
   const ddInv: Invoice = {

@@ -50,7 +50,7 @@ export async function fetchChargesfromDB(xlsxCharges: ChargesAndPaymentsObj[]) {
  */
 export async function fetchDDInvoiceData(date: string | Date) {
   try {
-    const [gmTotals, deptSales, storeExpenses, charges] = await Promise.all([
+    const [gmTotals, deptSales, storeExpenses, charges, otherPayments] = await Promise.all([
       db.combinedImportedTillTotal.findUniqueOrThrow({
         where: {
           date: new Date(new Date(date).toISOString().slice(0, 10)),
@@ -90,6 +90,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
           AND: [
             { date: new Date(new Date(date).toISOString().slice(0, 10)) },
             { customerId: "10528" },
+            { tranType: 13 },
           ],
         },
         select: {
@@ -105,6 +106,19 @@ export async function fetchDDInvoiceData(date: string | Date) {
           AND: [
             { date: new Date(new Date(date).toISOString().slice(0, 10)) },
             { customerId: { not: "10528" } },
+          ],
+        },
+        select: {
+          amount: true,
+        },
+      }),
+
+      db.charge.findMany({
+        where: {
+          AND: [
+            { date: new Date(new Date(date).toISOString().slice(0, 10)) },
+            { customerId: "10528" },
+            { tranType: 14 },
           ],
         },
         select: {
@@ -140,8 +154,9 @@ export async function fetchDDInvoiceData(date: string | Date) {
     ).toFixed(2)}`
 
     const totalCustCharges = charges.reduce((a, c) => a + +c.amount, 0)
+    const totalOtherPayments = otherPayments.reduce((a, c) => a + +c.amount, 0)
 
-    return { ...gmTotals, storeExp, deptSales, ddTitle, totalCustCharges }
+    return { ...gmTotals, storeExp, deptSales, ddTitle, totalCustCharges, totalOtherPayments }
   } catch (error: any) {
     console.error(error?.message ?? JSON.stringify(error))
     await db.$disconnect()
