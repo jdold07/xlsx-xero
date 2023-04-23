@@ -141,7 +141,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
           : process.env.XERO_DD_CONTACT_ID_WB,
     },
     date: date.toISOString().slice(0, 10),
-    dueDate: date.toISOString().slice(0, 10),
+    dueDate: new Date(date.getTime() + 86400000 * 2).toISOString().slice(0, 10),
     reference: data.ddTitle,
     status: Invoice.StatusEnum.SUBMITTED,
     lineAmountTypes: LineAmountTypes.Inclusive,
