@@ -1,4 +1,3 @@
-import { config } from "dotenv"
 import open from "open"
 import Readline from "readline/promises"
 import { XeroClient } from "xero-node"
@@ -14,7 +13,6 @@ newAuth()
  * @notes Seperate function only required initially or to authorise new Organisations.
  */
 async function newAuth() {
-  config()
   const client_id = process.env.XERO_CLIENT_ID ?? ""
   const client_secret = process.env.XERO_CLIENT_SECRET ?? ""
   const redirectUris = [process.env.XERO_REDIRECT_URI ?? ""]
@@ -25,7 +23,7 @@ async function newAuth() {
     clientId: client_id,
     clientSecret: client_secret,
     redirectUris,
-    scopes
+    scopes,
   })
   await xero.initialize()
   const consentUrl = await xero.buildConsentUrl()
@@ -37,7 +35,7 @@ async function newAuth() {
   // Create a readline interface to get the callback url from the user
   const rl = Readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   })
 
   console.log(
