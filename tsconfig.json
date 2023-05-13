@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
     "strict": true,
     "target": "ES2022",
     "lib": ["ES2022"],
-    "module": "CommonJS",
+    "module": "NodeNext",
     "allowJs": true,
-    "checkJs": false,
+    "checkJs": true,
     "sourceMap": false,
     "removeComments": true,
     "moduleResolution": "Node",
-    "esModuleInterop": true,
     "resolveJsonModule": true,
-    "outDir": "./dist/"
+    "esModuleInterop": true,
+    "outDir": "./dist/",
+    "baseUrl": "./"
   },
   "typeAcquisition": {
     "enable": true

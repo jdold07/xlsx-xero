@@ -2,8 +2,10 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,test,text,macos,react,remix,nextjs,python,vercel,dropbox,typings,synology,remix+vercel,remix+netlify,visualstudiocode,remix+arc,remix+cloudflarepages,remix+cloudflareworkers,archives
 
 ## Other ##
-src/resources/tokenSet.json
+src/lib/tokenSet.json
+src/prisma/**/*
 prisma/**/*
+
 
 ### Archives ###
 archive/**/*
