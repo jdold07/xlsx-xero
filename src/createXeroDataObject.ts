@@ -1,5 +1,6 @@
 import { CreditNote, CreditNotes, Invoice, Invoices, LineAmountTypes } from "xero-node"
 import { fetchDDInvoiceData } from "./dbQueries"
+import db from "./dbServer"
 import { getDueDate, verifyCharges } from "./helpers"
 
 export async function createXeroDataObject(logPath: string) {
@@ -25,6 +26,13 @@ export async function createXeroDataObject(logPath: string) {
       const isCredit = +txn?.amount < 0
 
       // Set variables for the invoice object
+      const terms = await db.customer.findUnique({
+        where: { customerId: txn.customerId },
+        select: {
+          termsType: true,
+          termsDays: true,
+        },
+      })
       const ref = `${txn.terminalId}/${txn.seqNo}`
       const glCode = txn.customerId === "45678" ? "42100" : "41000"
       const desc = `${
@@ -40,7 +48,7 @@ export async function createXeroDataObject(logPath: string) {
         second: "2-digit",
         hour12: false,
       })}\n* TransactionID: ${txn.id}`
-      const dueDate = getDueDate(txn.date)
+      const dueDate = getDueDate(txn.date, terms)
 
       // Create the xero object depending on the type (Invoice or CreditNote)
       if (isCredit) {
