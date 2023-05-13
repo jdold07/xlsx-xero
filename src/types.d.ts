@@ -1,4 +1,4 @@
-import type { Charge, Customer } from "@prisma/client"
+import type { Charge, Customer, TermsType } from "@prisma/client"
 import type { IncomingMessage } from "http"
 import type { CreditNote, CreditNotes, Invoice, Invoices, TokenSet, XeroClient } from "xero-node"
 
@@ -53,3 +53,6 @@ declare module "resources/tokenSet.json" {
   const tokenSet: ValidTokenSet
   export default tokenSet
 }
+
+/** Account trading terms from database store */
+export type TradingTerms = { termsType: TermsType; termsDays: number } | null
