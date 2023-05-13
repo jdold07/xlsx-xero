@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.4](https://github.com/jdold07/xlsx-xero/compare/v0.1.3...v0.1.4) (2023-05-13)
+
+
+### Features
+
+* ♻️ update to provide db data for getDueDate function ([24ba450](https://github.com/jdold07/xlsx-xero/commit/24ba45055472097f70063c80570fb04effad96b6))
+* ✨ add function to update customer trading terms via api ([294b4b4](https://github.com/jdold07/xlsx-xero/commit/294b4b4faaab24eb62ca0550ba462e4d325a2e4e))
+* ✨ update getDueDate function to use trading terms ([6c0a823](https://github.com/jdold07/xlsx-xero/commit/6c0a8230f1eef3cbfc8a46ae0e499e780e8fc59f))
+* 🏷️ add Terms type for trading terms addition ([8b35d8a](https://github.com/jdold07/xlsx-xero/commit/8b35d8a3088bbe708edb4fb93dc011d97efb8aaa))
+
+
+### Bug Fixes
+
+* 🩹 minor "fixes" to createDDInvoice function ([37871b5](https://github.com/jdold07/xlsx-xero/commit/37871b5f20af289ead413171105c6a54d145a175))
+* 🩹 modify due date for Day Docket Invoice ([fed0ab3](https://github.com/jdold07/xlsx-xero/commit/fed0ab34c255a860518df86c67d4b4b5606f7c84))
+* 🚑️ add otherPayments return from db ([71cffd6](https://github.com/jdold07/xlsx-xero/commit/71cffd6f0897c984fa5f2b2eddaf812a32c45a51))
+
 ### [0.1.3](https://github.com/jdold07/xlsx-xero/compare/v0.1.2...v0.1.3) (2023-04-02)
 
 
