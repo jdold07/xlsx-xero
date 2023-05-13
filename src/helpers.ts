@@ -1,11 +1,9 @@
-import { config } from "dotenv"
 import { appendFileSync, writeFileSync } from "fs"
 import { TokenSet } from "xero-node"
 import { fetchChargesfromDB } from "./dbQueries"
 import { parseXlsxFiles } from "./parseXlsx"
-import { ChargesAndPaymentsObjArrOBJ, SendToXeroResponse } from "./types"
+import { ChargesAndPaymentsObjArrOBJ, SendToXeroResponse, TradingTerms } from "./types"
 
-config()
 const logName = new Date().toISOString().slice(0, 10)
 const TZ = process.env?.TZ ? +process.env.TZ : 10
 
@@ -135,11 +133,11 @@ export async function verifyCharges(logPath: string) {
   if (!importedCharges.every((charge) => charge.isBalanced)) {
     console.warn(
       "\n",
-      "*".repeat(120),
+      "*".repeat(80),
       "\n",
       'WARN: Export batch does NOT reconcile with Total Debtors from the DD.  Review "For Approval"\'s in Xero before posting as "Approved".',
       "\n",
-      "*".repeat(120),
+      "*".repeat(80),
       "\n"
     )
   }
@@ -147,7 +145,7 @@ export async function verifyCharges(logPath: string) {
   if (unverifiedCharges.length) {
     console.warn(
       "\n",
-      "*".repeat(120),
+      "*".repeat(80),
       "\n",
       "The following charges require corrections prior to importing: \n"
     )
@@ -155,7 +153,7 @@ export async function verifyCharges(logPath: string) {
       console.warn(
         `\nCharge not matched in DB\n: ${JSON.stringify(charge, null, 2)}`,
         "\n",
-        "*".repeat(120),
+        "*".repeat(80),
         "\n"
       )
     }
@@ -163,7 +161,7 @@ export async function verifyCharges(logPath: string) {
   if (unverifiedCredits.length) {
     console.warn(
       "\n",
-      "*".repeat(120),
+      "*".repeat(80),
       "\n",
       "The following credit notes require corrections prior to importing: \n"
     )
@@ -171,7 +169,7 @@ export async function verifyCharges(logPath: string) {
       console.warn(
         `\nCredit note not matched in DB\n: ${JSON.stringify(charge, null, 2)}`,
         "\n",
-        "*".repeat(120),
+        "*".repeat(80),
         "\n"
       )
     }
@@ -186,20 +184,43 @@ export async function verifyCharges(logPath: string) {
 
 /**
  * Generates the due date required for the Xero Data object
- * - Set due date as end of month after end of month (EOM after EOM)
+ * Use terms from database to determine due date, defaulting to
+ * end of month after end of month (EOM after EOM) if no terms are set
  * @param {Date | string} curDate - The date of the transaction requiring a due date
+ * @param {TradingTerms} terms - The terms from the database
  * @returns {string} The due date in ISO format
  * @eg `2023-01-31`
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getDueDate(curDate: Date | string) {
+export function getDueDate(curDate: Date | string, terms: TradingTerms) {
   const date = new Date(curDate)
-  date.setDate(1)
+  let month = date.getMonth()
   let year = date.getFullYear()
-  let month = date.getMonth() + 1
-  if (month > 11) {
-    year++
-    month = 0
+  let day = date.getDate()
+
+  if (terms?.termsType === "DAYSAFTERBILLDATE") {
+    day += terms.termsDays
   }
-  return new Date(year, month + 1, 0, TZ).toISOString().slice(0, 10)
+
+  if (terms?.termsType === "OFFOLLOWINGMONTH") {
+    day = terms.termsDays
+    month++
+    if (month > 11) {
+      year++
+      month = 0
+    }
+  }
+
+  // If terms are not set, set due date to EOM after EOM
+  if (terms === null) {
+    day = 0
+    month++
+    if (month > 11) {
+      year++
+      month = 0
+    }
+    month++
+  }
+
+  return new Date(year, month, day, TZ / 1, (TZ % 1) * 60, 0, 0).toISOString().slice(0, 10)
 }
