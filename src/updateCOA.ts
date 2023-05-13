@@ -2,8 +2,8 @@ import type { IncomingMessage } from "http"
 import { Account, AccountType, Accounts, TokenSet, XeroClient } from "xero-node"
 import { refreshTokenSet, setActiveTenant } from "./apiFunctions"
 import { getTenantIndex } from "./helpers"
-import data from "./resources/coaData.json"
-import storedToken from "./resources/tokenSet.json"
+import data from "./lib/coaData.json"
+import storedToken from "./lib/tokenSet.json"
 
 interface XeroResponse {
   response: IncomingMessage

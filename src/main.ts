@@ -2,11 +2,12 @@ import { TokenSet, XeroClient } from "xero-node"
 import { refreshTokenSet, sendInvOrCRToXero, setActiveTenant } from "./apiFunctions"
 import { createXeroDataObject } from "./createXeroDataObject"
 import { getLogPath, getTenantIndex, writeResponseLog } from "./helpers"
-import storedToken from "./resources/tokenSet.json"
+import storedToken from "./lib/tokenSet.json"
 
 main(process.argv[2])
 
 async function main(entity: string) {
+  console.log("Environment Args Index 2: ", process.argv[2])
   try {
     const logPath = getLogPath(entity)
     const tenantIndex = getTenantIndex(entity)
