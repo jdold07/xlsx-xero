@@ -1,6 +1,5 @@
-import open from "open"
 import Readline from "readline/promises"
-import { XeroClient } from "xero-node"
+import { XeroClient } from "xero-node/dist/XeroClient"
 import { writeTokenSetJson } from "./helpers"
 
 newAuth()
@@ -30,7 +29,7 @@ async function newAuth() {
   console.log(consentUrl)
 
   // Open the consent url in the user's browser
-  open(consentUrl)
+  import("open").then((open) => open.default(consentUrl))
 
   // Create a readline interface to get the callback url from the user
   const rl = Readline.createInterface({
