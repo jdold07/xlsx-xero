@@ -3,19 +3,17 @@
     "strict": true,
     "target": "ES2022",
     "lib": ["ES2022"],
-    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "module": "CommonJS",
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
-    "checkJs": true,
-    "sourceMap": false,
+    "checkJs": false,
+    "sourceMap": true,
     "removeComments": true,
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
     "esModuleInterop": true,
-    "outDir": "./dist/",
-    "baseUrl": "./"
+    "resolveJsonModule": true,
+    "outDir": "./dist/"
   },
-  "typeAcquisition": {
-    "enable": true
-  },
+  "types": ["node", "fs"],
   "include": ["./src/**/*"]
 }
