@@ -21,9 +21,7 @@ export function getLogPath(entity: string): string {
       if (!process.env?.RF_DD_IMPORT_LOG_PATH_WESTBROOK) break
       return process.env?.RF_DD_IMPORT_LOG_PATH_WESTBROOK
     default:
-      console.error(
-        "Invalid or null entity value provided or environment variable has not been set"
-      )
+      console.error("Invalid or null entity value provided or environment variable has not been set")
       break
   }
   throw new Error("Invalid or null entity value provided or environment variable has not been set")
@@ -50,11 +48,7 @@ export function getTenantIndex(entity: string) {
  * @param {string} logPath - The path of the directory to store log files for the given entity
  * @returns {void}
  */
-export function writeResponseLog(
-  invRes: SendToXeroResponse,
-  crRes: SendToXeroResponse,
-  logPath: string
-) {
+export function writeResponseLog(invRes: SendToXeroResponse, crRes: SendToXeroResponse, logPath: string) {
   for (const res of [invRes, crRes]) {
     if (res) {
       appendFileSync(`${logPath}/res-${logName}.json`, JSON.stringify(res, null, 2))
@@ -69,10 +63,7 @@ export function writeResponseLog(
  * @param {string} jsonPath - The path for storing the tokenSet JSON
  * @returns {Promise<boolean>}
  */
-export async function writeTokenSetJson(
-  tokenSet: TokenSet,
-  jsonPath = process.env.XERO_TOKEN_SET_PATH ?? null
-) {
+export async function writeTokenSetJson(tokenSet: TokenSet, jsonPath = process.env.XERO_TOKEN_SET_PATH ?? null) {
   try {
     if (
       !tokenSet ||
@@ -126,9 +117,7 @@ export async function verifyCharges(logPath: string) {
   const xlsxCharges = importedCharges.map((charge) => charge.accountSales).flat()
   const xlsxCredits = importedCharges.map((charge) => charge.accountCR).flat()
   const { dbCharges, unverifiedCharges } = await fetchChargesfromDB(xlsxCharges)
-  const { dbCharges: dbCredits, unverifiedCharges: unverifiedCredits } = await fetchChargesfromDB(
-    xlsxCredits
-  )
+  const { dbCharges: dbCredits, unverifiedCharges: unverifiedCredits } = await fetchChargesfromDB(xlsxCredits)
 
   if (!importedCharges.every((charge) => charge.isBalanced)) {
     console.warn(
@@ -143,41 +132,19 @@ export async function verifyCharges(logPath: string) {
   }
 
   if (unverifiedCharges.length) {
-    console.warn(
-      "\n",
-      "*".repeat(80),
-      "\n",
-      "The following charges require corrections prior to importing: \n"
-    )
+    console.warn("\n", "*".repeat(80), "\n", "The following charges require corrections prior to importing: \n")
     for (const charge of unverifiedCharges) {
-      console.warn(
-        `\nCharge not matched in DB\n: ${JSON.stringify(charge, null, 2)}`,
-        "\n",
-        "*".repeat(80),
-        "\n"
-      )
+      console.warn(`\nCharge not matched in DB\n: ${JSON.stringify(charge, null, 2)}`, "\n", "*".repeat(80), "\n")
     }
   }
   if (unverifiedCredits.length) {
-    console.warn(
-      "\n",
-      "*".repeat(80),
-      "\n",
-      "The following credit notes require corrections prior to importing: \n"
-    )
+    console.warn("\n", "*".repeat(80), "\n", "The following credit notes require corrections prior to importing: \n")
     for (const charge of unverifiedCredits) {
-      console.warn(
-        `\nCredit note not matched in DB\n: ${JSON.stringify(charge, null, 2)}`,
-        "\n",
-        "*".repeat(80),
-        "\n"
-      )
+      console.warn(`\nCredit note not matched in DB\n: ${JSON.stringify(charge, null, 2)}`, "\n", "*".repeat(80), "\n")
     }
   }
   if (unverifiedCharges.length || unverifiedCredits.length) {
-    throw new Error(
-      "Exited without sending to Xero, make corrections before attempting import again."
-    )
+    throw new Error("Exited without sending to Xero, make corrections before attempting import again.")
   }
   return { dbCharges, dbCredits, dates, tillVariances }
 }
