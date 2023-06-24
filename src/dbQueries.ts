@@ -23,6 +23,8 @@ export async function fetchChargesfromDB(xlsxCharges: ChargesAndPaymentsObj[]) {
           customer: {
             select: {
               xeroId: true,
+              termsType: true,
+              termsDays: true,
             },
           },
           seqNo: true,
@@ -103,10 +105,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
 
       db.charge.findMany({
         where: {
-          AND: [
-            { date: new Date(new Date(date).toISOString().slice(0, 10)) },
-            { customerId: { not: "10528" } },
-          ],
+          AND: [{ date: new Date(new Date(date).toISOString().slice(0, 10)) }, { customerId: { not: "10528" } }],
         },
         select: {
           amount: true,
@@ -147,11 +146,9 @@ export async function fetchDDInvoiceData(date: string | Date) {
         .join(""),
     }
 
-    const ddTitle = `DD/${gmTotals.date
-      .toLocaleDateString("en-AU", { weekday: "short" })
-      .toLocaleUpperCase()}/${gmTotals.customerCount}/${(
-      +gmTotals.totalSales / gmTotals.customerCount
-    ).toFixed(2)}`
+    const ddTitle = `DD/${gmTotals.date.toLocaleDateString("en-AU", { weekday: "short" }).toLocaleUpperCase()}/${
+      gmTotals.customerCount
+    }/${(+gmTotals.totalSales / gmTotals.customerCount).toFixed(2)}`
 
     const totalCustCharges = charges.reduce((a, c) => a + +c.amount, 0)
     const totalOtherPayments = otherPayments.reduce((a, c) => a + +c.amount, 0)
