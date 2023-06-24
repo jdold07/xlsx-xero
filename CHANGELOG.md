@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.6](https://github.com/jdold07/xlsx-xero/compare/v0.1.5...v0.1.6) (2023-06-24)
+
+
+### Bug Fixes
+
+* 🩹 fix error in `getDueDate` func RE `TZ` handling ([1413d27](https://github.com/jdold07/xlsx-xero/commit/1413d27b28840b8182a08cb12fae2f60436796a3))
+
+
+### Build Related
+
+* 📦 update packages to latest ([c7a5035](https://github.com/jdold07/xlsx-xero/commit/c7a5035ba3a7f314a02ce97ca19ba361ac1dfeb0))
+* 🔧 config changes around esm modules ([37f9bd7](https://github.com/jdold07/xlsx-xero/commit/37f9bd73ad09e2f7aae03cf88125a813157b6294))
+* **config:** 🔧 update tsconfig to ESNext modules ([8e790ad](https://github.com/jdold07/xlsx-xero/commit/8e790ad6bfacf6ee33c354bd6bd4ea9be2961c8c))
+* **db:** ⚡️ remove query for `TradingTerms` & update glCodes ([cfe221f](https://github.com/jdold07/xlsx-xero/commit/cfe221f3a827508b2ef4fcb7d6a8ce6387b79f1c))
+* **db:** 🗃 edit `fetchChargesfromDB` to return `TradingTerms` ([d5aac68](https://github.com/jdold07/xlsx-xero/commit/d5aac6838be3edeb9cf540074c1b1f1b5d96cb47))
+* prettier code formatting only ([5d0f865](https://github.com/jdold07/xlsx-xero/commit/5d0f8651af3bffd8aeb868d1d01fbb57c17f70db))
+* reconfigure `open` import and call for esm workaround ([d3146bf](https://github.com/jdold07/xlsx-xero/commit/d3146bf1a9d6eaa7c0748aed566603c4f4791ea4))
+* **types:** 🏷️ update `ChargeWithCustomer` type after query edit ([d90fad6](https://github.com/jdold07/xlsx-xero/commit/d90fad6a49a78b8c8a2926584695961d96194c45))
+
 ### [0.1.5](https://github.com/jdold07/xlsx-xero/compare/v0.1.4...v0.1.5) (2023-05-13)
 
 ### [0.1.4](https://github.com/jdold07/xlsx-xero/compare/v0.1.3...v0.1.4) (2023-05-13)
