@@ -14,7 +14,6 @@
   "description": "A Node utility to import Excel (xls or xlsx) invoice summary data to Xero as Invoices.  Parses Excel (xls or xlsx) workbook data and generates an \"Invoices\" and a \"CreditNotes\" data object and sends the generated \"Invoices\" and/or \"CreditNotes\" object/s to Xero via the Xero api.",
   "main": "src/main.ts",
   "types": "src/types.d.ts",
-  "type": "module",
   "scripts": {
     "auth-new-tenant": "ts-node --esm src/newAuth.ts",
     "import-dd-xero-pw": "ts-node --esm src/main.ts pw",

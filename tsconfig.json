@@ -3,7 +3,7 @@
     "strict": true,
     "target": "ESNext",
     "lib": ["ES2023"],
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
