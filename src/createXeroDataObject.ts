@@ -26,18 +26,11 @@ export async function createXeroDataObject(logPath: string) {
       const isCredit = +txn?.amount < 0
 
       // Set variables for the invoice object
-      const terms = await db.customer.findUnique({
-        where: { customerId: txn.customerId },
-        select: {
-          termsType: true,
-          termsDays: true,
-        },
-      })
+      const terms = { termsType: txn?.customer?.termsType, termsDays: txn?.customer?.termsDays }
+
       const ref = `${txn.terminalId}/${txn.seqNo}`
-      const glCode = txn.customerId === "45678" ? "42100" : "41000"
-      const desc = `${
-        txn.notes ?? "Customer POS Account Sale"
-      }: \n* POS ID: ${ref}\n* Timestamp: ${new Date(
+      const glCode = txn.customerId === "45678" ? "42010" : "41010"
+      const desc = `${txn.notes ?? "Customer POS Account Sale"}: \n* POS ID: ${ref}\n* Timestamp: ${new Date(
         (txn.tranTimeStamp?.getTime() ?? 0) - 36000000 ?? Date.now()
       )?.toLocaleString("en-AU", {
         day: "2-digit",
@@ -129,24 +122,21 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
     quantity: 1,
     unitAmount: +(d?.sellEx ?? 0),
     taxAmount: 0,
-    accountCode: d?.department.glCodeSales ?? "41000",
+    accountCode: d?.department.glCodeSales ?? "41010",
     taxType: "EXEMPTOUTPUT",
   }))
   const freSales =
     +data.totalSales -
     deptsToInclude.reduce((a, c) => a + +(c?.sellEx ?? 0), 0) -
     gstSales -
-    (+data.totalAccountSales - data.storeExp.totalExp) -
-    data.totalOtherPayments
+    (+data.totalAccountSales - data.storeExp.totalExp) +
+    data.totalOtherPayments //totalOtherPayments will be negative that's why we add it
   const rounding = +(data.totalRounding ?? 0) * -1
 
   const ddInv: Invoice = {
     type: Invoice.TypeEnum.ACCREC,
     contact: {
-      contactID:
-        process.argv[2] === "pw"
-          ? process.env.XERO_DD_CONTACT_ID_PW
-          : process.env.XERO_DD_CONTACT_ID_WB,
+      contactID: process.argv[2] === "pw" ? process.env.XERO_DD_CONTACT_ID_PW : process.env.XERO_DD_CONTACT_ID_WB,
     },
     date: date.toISOString().slice(0, 10),
     dueDate: new Date(date.getTime() + 86400000 * 2).toISOString().slice(0, 10),
@@ -160,7 +150,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: gstSales,
         taxAmount: +data.totalGst ?? 0,
-        accountCode: "41000",
+        accountCode: "41010",
         taxType: "OUTPUT",
       },
       {
@@ -168,7 +158,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: freSales,
         taxAmount: 0,
-        accountCode: "41000",
+        accountCode: "41010",
         taxType: "EXEMPTOUTPUT",
       },
       ...deptSalesLineItems,
@@ -193,7 +183,7 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
         quantity: 1,
         unitAmount: +(data.storeExp.totalExp ?? 0) * -1,
         taxAmount: 0,
-        accountCode: process.argv[2] === "wb" ? "51040" : "51015",
+        accountCode: process.argv[2] === "wb" ? "51310" : "51130",
         taxType: "EXEMPTEXPENSES",
       },
     ],
