@@ -1,5 +1,5 @@
 {
-  "name": "xlsx-xero",
+  "name": "@jdold07/xlsx-xero",
   "version": "0.1.6",
   "license": "MIT",
   "author": {
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "https://github.com/jdold07/xlsx-xero"
   },
-  "description": "A Node utility to import Excel (xls or xlsx) invoice summary data to Xero as Invoices.  Parses Excel (xls or xlsx) workbook data and generates an \"Invoices\" and a \"CreditNotes\" data object and sends the generated \"Invoices\" and/or \"CreditNotes\" object/s to Xero via the Xero api.",
+  "description": "A Node utility to import Excel (xls or xlsx) invoice summary data to Xero as Invoices.  Parses Excel (xls or xlsx) workbook data and generates an \"Invoices\" and a \"CreditNotes\" data object, verifies the object against POS db data for accuracy and sends the generated \"Invoices\" and/or \"CreditNotes\" object/s to Xero via the Xero api.",
   "main": "src/main.ts",
   "types": "src/types.d.ts",
   "scripts": {

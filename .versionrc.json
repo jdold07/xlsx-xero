@@ -19,5 +19,6 @@
       "filename": "package.json",
       "type": "json"
     }
-  ]
+  ],
+  "releaseCommitMessageFormat": "chore(bump): `@jdold07/xlsx-xero` -> {{currentTag}}"
 }
