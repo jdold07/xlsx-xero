@@ -16,10 +16,7 @@
   "types": "src/types.d.ts",
   "scripts": {
     "auth-new-tenant": "ts-node --esm src/newAuth.ts",
-    "import-dd-xero-pw": "ts-node --esm src/main.ts pw",
-    "import-dd-xero-wb": "ts-node --esm src/main.ts wb",
-    "update-coa-xero-pw": "ts-node --esm src/updateCoa.ts pw",
-    "update-coa-xero-wb": "ts-node --esm src/updateCoa.ts wb",
+    "import-dd-xero": "ts-node --esm src/main.ts",
     "release": "standard-version"
   },
   "keywords": [
