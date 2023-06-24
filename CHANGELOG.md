@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/jdold07/xlsx-xero/compare/v0.1.6...v0.2.0) (2023-06-24)
+
+
+### Build Related
+
+* **config:** 🔧 revert to commonJS to resolve Xero SDK ([8c3833b](https://github.com/jdold07/xlsx-xero/commit/8c3833b4b69d54b70d3650f41f361ace921c25ab))
+
 ### [0.1.6](https://github.com/jdold07/xlsx-xero/compare/v0.1.5...v0.1.6) (2023-06-24)
 
 
