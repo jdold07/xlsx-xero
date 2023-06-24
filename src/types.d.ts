@@ -21,7 +21,7 @@ export type ChargesAndPaymentsObjArrOBJ = {
 }
 
 /** Object of Charge including Customer from Prisma */
-export type ChargeWithCustomer = Partial<Charge> & { customer: Pick<Customer, "xeroId"> }
+export type ChargeWithCustomer = Partial<Charge> & { customer: Pick<Customer, "xeroId" | "termsType" | "termsDays"> }
 
 /** Transaction Type for node-xero API */
 export type InvoiceType<T> = T extends CreditNote ? CreditNote : Invoice
