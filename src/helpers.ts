@@ -189,5 +189,5 @@ export function getDueDate(curDate: Date | string, terms: TradingTerms) {
     month++
   }
 
-  return new Date(year, month, day, TZ / 1, (TZ % 1) * 60, 0, 0).toISOString().slice(0, 10)
+  return new Date(year, month, day, Math.trunc(TZ), (TZ % 1) * 60, 0, 0).toISOString().slice(0, 10)
 }
