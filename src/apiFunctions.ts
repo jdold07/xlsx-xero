@@ -62,9 +62,8 @@ export async function sendInvOrCRToXero(
   activeTenantId: string
 ) {
   try {
-    let invRes: SendToXeroResponse = { response: {}, body: invData }
-
-    let crRes: SendToXeroResponse = { response: {}, body: creditData }
+    let invRes = {} as SendToXeroResponse
+    let crRes = {} as SendToXeroResponse
 
     if (invData.invoices?.length) {
       invRes = await xero.accountingApi.createInvoices(activeTenantId, invData, false, 2)
