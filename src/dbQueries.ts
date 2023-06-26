@@ -1,4 +1,5 @@
 import db from "./dbServer"
+import { TZ_OFFSET } from "./helpers"
 import { ChargesAndPaymentsObj, ChargeWithCustomer } from "./types"
 
 export async function fetchChargesfromDB(xlsxCharges: ChargesAndPaymentsObj[]) {
@@ -41,7 +42,6 @@ export async function fetchChargesfromDB(xlsxCharges: ChargesAndPaymentsObj[]) {
       dbCharges.push(dbChargeWithNotes)
     }
   }
-  console.log("Charges for comparison fetched from DB")
   return { dbCharges, unverifiedCharges }
 }
 
@@ -52,10 +52,11 @@ export async function fetchChargesfromDB(xlsxCharges: ChargesAndPaymentsObj[]) {
  */
 export async function fetchDDInvoiceData(date: string | Date) {
   try {
+    const curDate = new Date(new Date(date).toISOString().slice(0, 10))
     const [gmTotals, deptSales, storeExpenses, charges, otherPayments] = await Promise.all([
       db.combinedImportedTillTotal.findUniqueOrThrow({
         where: {
-          date: new Date(new Date(date).toISOString().slice(0, 10)),
+          date: curDate,
         },
         select: {
           date: true,
@@ -72,7 +73,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
 
       db.departmentSales.findMany({
         where: {
-          date: new Date(new Date(date).toISOString().slice(0, 10)),
+          date: curDate,
         },
         select: {
           deptCode: true,
@@ -89,11 +90,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
 
       db.charge.findMany({
         where: {
-          AND: [
-            { date: new Date(new Date(date).toISOString().slice(0, 10)) },
-            { customerId: "10528" },
-            { tranType: 13 },
-          ],
+          AND: [{ date: curDate }, { customerId: "10528" }, { tranType: 13 }],
         },
         select: {
           amount: true,
@@ -105,7 +102,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
 
       db.charge.findMany({
         where: {
-          AND: [{ date: new Date(new Date(date).toISOString().slice(0, 10)) }, { customerId: { not: "10528" } }],
+          AND: [{ date: curDate }, { customerId: { not: "10528" } }],
         },
         select: {
           amount: true,
@@ -114,11 +111,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
 
       db.charge.findMany({
         where: {
-          AND: [
-            { date: new Date(new Date(date).toISOString().slice(0, 10)) },
-            { customerId: "10528" },
-            { tranType: 14 },
-          ],
+          AND: [{ date: curDate }, { customerId: "10528" }, { tranType: 14 }],
         },
         select: {
           amount: true,
@@ -132,7 +125,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
         .map(
           (v) =>
             `${v.terminalId}/${v.seqNo} - ${new Date(
-              (v.tranTimeStamp?.getTime() ?? 0) - 36000000 ?? Date.now()
+              (v.tranTimeStamp?.getTime() ?? 0) - TZ_OFFSET ?? Date.now()
             )?.toLocaleString("en-AU", {
               day: "2-digit",
               month: "2-digit",
