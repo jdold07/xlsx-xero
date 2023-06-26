@@ -7,7 +7,6 @@ import storedToken from "./lib/tokenSet.json"
 main(process.argv[2])
 
 async function main(entity: string) {
-  console.log("Environment Args Index 2: ", process.argv[2])
   try {
     const logPath = getLogPath(entity)
     const tenantIndex = getTenantIndex(entity)
