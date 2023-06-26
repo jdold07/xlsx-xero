@@ -1,6 +1,5 @@
 import { CreditNote, CreditNotes, Invoice, Invoices, LineAmountTypes } from "xero-node"
 import { fetchDDInvoiceData } from "./dbQueries"
-import db from "./dbServer"
 import { getDueDate, verifyCharges } from "./helpers"
 
 export async function createXeroDataObject(logPath: string) {
@@ -18,7 +17,7 @@ export async function createXeroDataObject(logPath: string) {
     for (const txn of variant) {
       // Keep TS happy and check for values that may be undefined because of using Partial
       if (!(txn?.date && txn?.amount)) {
-        console.error("Invoice is missing date or amount: ", JSON.stringify(txn))
+        console.error("Invoice is missing date or amount: ", JSON.stringify(txn, null, 2))
         continue
       }
 
