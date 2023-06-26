@@ -9,10 +9,11 @@ import { ChargesAndPaymentsObj, ParsedXlsxData } from "./types"
  * Extract Excel Day Docket customer charge data from Excel sheets
  */
 export function parseXlsxFiles(logPath: string) {
-  if (!process.env.XERO_INPUT_PATH)
-    throw new Error("XERO_INPUT_PATH environment variable is not set")
+  if (!process.env.XERO_INPUT_PATH) throw new Error("XERO_INPUT_PATH environment variable is not set")
 
   const files = getDDFiles(process.env.XERO_INPUT_PATH)
+  if (!files.length) throw new Error("No importable files found in the import directory")
+
   const data: ParsedXlsxData[] = []
   const dates: Date[] = []
   const tillVariances: number[] = []
@@ -99,10 +100,7 @@ function summaryChargesAndPayments(ws: WorkSheet) {
 
     // Adding triggerCount === 1 so store charges aren't included.
     // This is temporary while I get customer charges importing OK.
-    if (
-      (!charge.amount && !charge.customerId && !charge.seqNo && !charge.notes) ||
-      triggerCount === 0
-    ) {
+    if ((!charge.amount && !charge.customerId && !charge.seqNo && !charge.notes) || triggerCount === 0) {
       continue
     }
     if (charge.amount !== "Amount" && Math.abs(+charge.amount.toFixed(2)) !== 0) {
@@ -134,18 +132,15 @@ function summaryChargesAndPayments(ws: WorkSheet) {
   } while (ws?.[`D${i}`]?.v !== "Total Charges")
 
   // Get Total Debtors
-  const row = +(Object.keys(ws).find((key) => ws[key]?.v === "Total Debtors") ?? "0").replace(
-    /\D/g,
-    ""
-  )
+  const row = +(Object.keys(ws).find((key) => ws[key]?.v === "Total Debtors") ?? "0").replace(/\D/g, "")
   const totalDebtors: number = ws?.[`G${row}`]?.v ?? 0
 
   // Verify total debtors sums to correct amount
   const isBalanced =
-    [
-      ...accountSales.map((charge) => charge.amount),
-      ...accountCR.map((charge) => charge.amount),
-    ].reduce((a, c) => a + c, 0) === totalDebtors
+    [...accountSales.map((charge) => charge.amount), ...accountCR.map((charge) => charge.amount)].reduce(
+      (a, c) => a + c,
+      0
+    ) === totalDebtors
 
   return { accountSales, accountCR, totalDebtors, isBalanced }
 }
