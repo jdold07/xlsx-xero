@@ -1,4 +1,4 @@
-import { appendFileSync, writeFileSync } from "fs"
+import { constants, promises, writeFileSync } from "fs"
 import { TokenSet } from "xero-node"
 import { fetchChargesfromDB } from "./dbQueries"
 import { parseXlsxFiles } from "./parseXlsx"
@@ -41,17 +41,38 @@ export function getTenantIndex(entity: string) {
 }
 
 /**
+ * *|| CHECK IF LOG FILE ALREADY EXISTS ||*
+ * Checks if a log file already exists and returns a new file name if it does
+ * @param {string} logFile - The path of the log file to check
+ * @param {number} attempt - The number of times the function has been called recursively
+ * @returns {Promise<string>} - The path of the log file to write to
+ */
+export async function alreadyExistsLogFile(logFile: string, attempt = 0): Promise<string> {
+  const doesExist = await promises
+    .access(logFile, constants.F_OK)
+    .then(() => true)
+    .catch(() => false)
+  return doesExist
+    ? await alreadyExistsLogFile(
+        logFile.replace(/(?<=\d{4}-\d{2}-\d{2}).*\.json/, `${String.fromCharCode(++attempt + 96)}.json`),
+        attempt
+      )
+    : logFile
+}
+
+/**
  * *|| FILE WRITES ||*
  * Writes the response from the Xero API to a log file
  * @param {SendToXeroResponse} invRes - The response from the Xero API for the invoiceData
  * @param {SendToXeroResponse} crRes - The response from the Xero API for the creditData
  * @param {string} logPath - The path of the directory to store log files for the given entity
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function writeResponseLog(invRes: SendToXeroResponse, crRes: SendToXeroResponse, logPath: string) {
+export async function writeResponseLog(invRes: SendToXeroResponse, crRes: SendToXeroResponse, logPath: string) {
   for (const res of [invRes, crRes]) {
     if (res) {
-      appendFileSync(`${logPath}/res-${logName}.json`, JSON.stringify(res, null, 2))
+      const fileName = alreadyExistsLogFile(`${logPath}/res-${logName}.json`)
+      writeFileSync(await fileName, JSON.stringify(res, null, 2))
     }
   }
 }
@@ -93,11 +114,12 @@ export async function writeTokenSetJson(tokenSet: TokenSet, jsonPath = process.e
  * - Writes json stringified parsed xlsx data to log file
  * @param {ChargesAndPaymentsObjArrOBJ[]} data - The parsed xlsx data
  * @param {string} logPath - The path of the directory to store log files for the given entity
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function writeRequestLog(data: ChargesAndPaymentsObjArrOBJ[], logPath: string) {
+export async function writeRequestLog(data: ChargesAndPaymentsObjArrOBJ[], logPath: string) {
   if (data.length) {
-    appendFileSync(`${logPath}/req-${logName}.json`, JSON.stringify(data, null, 2))
+    const fileName = alreadyExistsLogFile(`${logPath}/req-${logName}.json`)
+    writeFileSync(await fileName, JSON.stringify(data, null, 2))
     console.log("XLSX data written to JSON invoiceData file.")
   }
 }
@@ -112,19 +134,21 @@ export function writeRequestLog(data: ChargesAndPaymentsObjArrOBJ[], logPath: st
  * @returns {void}
  */
 export async function verifyCharges(logPath: string) {
-  const { data: importedCharges, dates, tillVariances } = parseXlsxFiles(logPath)
+  const { data: importedDays, dates, tillVariances } = parseXlsxFiles(logPath)
 
-  const xlsxCharges = importedCharges.map((charge) => charge.accountSales).flat()
-  const xlsxCredits = importedCharges.map((charge) => charge.accountCR).flat()
+  const xlsxCharges = importedDays.map((day) => day.accountSales).flat()
+  const xlsxCredits = importedDays.map((day) => day.accountCR).flat()
   const { dbCharges, unverifiedCharges } = await fetchChargesfromDB(xlsxCharges)
+  console.log("Charges for verification fetched from DB")
   const { dbCharges: dbCredits, unverifiedCharges: unverifiedCredits } = await fetchChargesfromDB(xlsxCredits)
+  console.log("Credits for verification fetched from DB")
 
-  if (!importedCharges.every((charge) => charge.isBalanced)) {
+  if (!importedDays.every((day) => day.isBalanced)) {
     console.warn(
       "\n",
       "*".repeat(80),
       "\n",
-      'WARN: Export batch does NOT reconcile with Total Debtors from the DD.  Review "For Approval"\'s in Xero before posting as "Approved".',
+      'WARN: Charges & credits to import DO NOT reconcile with Total Debtors from the DD.  Manually review "For Approval"\'s in Xero before posting as "Approved"!!!',
       "\n",
       "*".repeat(80),
       "\n"
@@ -132,19 +156,19 @@ export async function verifyCharges(logPath: string) {
   }
 
   if (unverifiedCharges.length) {
-    console.warn("\n", "*".repeat(80), "\n", "The following charges require corrections prior to importing: \n")
+    console.warn("\n", "*".repeat(80), "\n", "The following charges require corrections prior to importing:")
     for (const charge of unverifiedCharges) {
-      console.warn(`\nCharge not matched in DB\n: ${JSON.stringify(charge, null, 2)}`, "\n", "*".repeat(80), "\n")
+      console.warn(`\nCharge not matched in DB: ${JSON.stringify(charge, null, 2)}`, "\n\n", "*".repeat(80), "\n")
     }
   }
   if (unverifiedCredits.length) {
-    console.warn("\n", "*".repeat(80), "\n", "The following credit notes require corrections prior to importing: \n")
+    console.warn("\n", "*".repeat(80), "\n", "The following credit notes require corrections prior to importing:")
     for (const charge of unverifiedCredits) {
-      console.warn(`\nCredit note not matched in DB\n: ${JSON.stringify(charge, null, 2)}`, "\n", "*".repeat(80), "\n")
+      console.warn(`\nCredit note not matched in DB: ${JSON.stringify(charge, null, 2)}`, "\n\n", "*".repeat(80), "\n")
     }
   }
   if (unverifiedCharges.length || unverifiedCredits.length) {
-    throw new Error("Exited without sending to Xero, make corrections before attempting import again.")
+    throw new Error("NOTHING IMPORTED TO Xero, check transactionsabove before attempting to import again.")
   }
   return { dbCharges, dbCredits, dates, tillVariances }
 }
@@ -191,3 +215,6 @@ export function getDueDate(curDate: Date | string, terms: TradingTerms) {
 
   return new Date(year, month, day, Math.trunc(TZ), (TZ % 1) * 60, 0, 0).toISOString().slice(0, 10)
 }
+
+/** Timezone hours in milliseconds */
+export const TZ_OFFSET = new Date().getTimezoneOffset() * 60 * 1000
