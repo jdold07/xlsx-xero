@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/jdold07/xlsx-xero/compare/v0.2.0...v0.3.0) (2023-06-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* Add programatic uploading of DD xls files with DD invoices.  This required some changes in existing logic, but absolutely worth the change.  No more forgetting the attachments during approval!!!
+
+### Features
+
+* ✨ add uploading of file attachments for DD invoices ([fe7af81](https://github.com/jdold07/xlsx-xero/commit/fe7af81052bf718b1e4983dbdd931c41e18700cd))
+* ✨ refactor & add log file exists check ([1e84e04](https://github.com/jdold07/xlsx-xero/commit/1e84e0482a42147f2bcfa6f081823c011a063e95))
+* ✨ replace hardcoded with dynamic timezone offset ([61ab284](https://github.com/jdold07/xlsx-xero/commit/61ab284f11c6828f9796d6209bb497eea1bf2525))
+
+
+### Build Related
+
+* ♻️ remove db import & format log output ([3a25e96](https://github.com/jdold07/xlsx-xero/commit/3a25e96cd7a2e9aa71926cc98de639828b01ee76))
+* ♻️ tweak initialisation of invRes & crRes ([c1d9764](https://github.com/jdold07/xlsx-xero/commit/c1d976472f1907ee6e7be08989c3a4036db76113))
+* ⚡️ add check for no files in import dir ([196e68e](https://github.com/jdold07/xlsx-xero/commit/196e68e7f53f067320a6bc60b4721b3d4230eef1))
+* 📦 add timezone-mock package ([cd565b8](https://github.com/jdold07/xlsx-xero/commit/cd565b8632ed4191f557e350d53b577b8b5c1218))
+* **types:** 🏷️ update types for file attachments ([c316de8](https://github.com/jdold07/xlsx-xero/commit/c316de8f22cb9f2b6ae7afcd233efed55fe33f12))
+
 ## [0.2.0](https://github.com/jdold07/xlsx-xero/compare/v0.1.6...v0.2.0) (2023-06-24)
 
 
