@@ -1,6 +1,7 @@
 import type { Charge, Customer, TermsType } from "@prisma/client"
+import type { ReadStream } from "fs"
 import type { IncomingMessage } from "http"
-import type { CreditNote, CreditNotes, Invoice, Invoices, TokenSet, XeroClient } from "xero-node"
+import type { Attachments, CreditNote, CreditNotes, Invoice, Invoices, TokenSet, XeroClient } from "xero-node"
 
 /** Charges & Payments Data Object contains all Charges & Payments data for a single day */
 export type ChargesAndPaymentsObj = {
@@ -32,9 +33,15 @@ export type SendToXero =
   | typeof XeroClient.prototype.accountingApi.createCreditNotes
 
 /** sendToXero Invoices and/or CreditNotes Promise array return Type */
-export type SendToXeroResponse = {
+export type XeroResponseCreateInvoices = {
   response: Partial<IncomingMessage>
   body: Invoices | CreditNotes
+}
+
+/** sendToXero File Attachments Promise array return Type */
+export type XeroResponseCreateAttachments = {
+  response: Partial<IncomingMessage>
+  body: Attachments
 }
 
 /** Parsed xlsx data object */
@@ -56,3 +63,6 @@ declare module "resources/tokenSet.json" {
 
 /** Account trading terms from database store */
 export type TradingTerms = { termsType: TermsType; termsDays: number } | null
+
+/** Xero Accounting API File Attachment Object */
+export type FileAttachment = { date: Date; fileName: string; content: ReadStream; mimeType: string }
