@@ -1,16 +1,20 @@
 import { CreditNote, CreditNotes, Invoice, Invoices, LineAmountTypes } from "xero-node"
 import { fetchDDInvoiceData } from "./dbQueries"
-import { getDueDate, verifyCharges } from "./helpers"
+import { TZ_OFFSET, createFileAttachment, getDueDate, verifyCharges } from "./helpers"
+import { FileAttachment } from "./types"
 
 export async function createXeroDataObject(logPath: string) {
   const { dbCharges, dbCredits, dates, tillVariances } = await verifyCharges(logPath)
   const invoices: Invoices = { invoices: [] }
   const credits: CreditNotes = { creditNotes: [] }
+  const fileAttachments: FileAttachment[] = []
 
   //Get DD Xero Invoice for the day
   for (let i = 0; i < dates.length; i++) {
     const ddInvoice = await createDDInvoice(dates[i], tillVariances[i])
     invoices.invoices?.push(ddInvoice)
+    const fileAttachment = await createFileAttachment(dates[i])
+    fileAttachments.push(fileAttachment)
   }
 
   for (const variant of [dbCharges, dbCredits]) {
@@ -30,7 +34,7 @@ export async function createXeroDataObject(logPath: string) {
       const ref = `${txn.terminalId}/${txn.seqNo}`
       const glCode = txn.customerId === "45678" ? "42010" : "41010"
       const desc = `${txn.notes ?? "Customer POS Account Sale"}: \n* POS ID: ${ref}\n* Timestamp: ${new Date(
-        (txn.tranTimeStamp?.getTime() ?? 0) - 36000000 ?? Date.now()
+        (txn.tranTimeStamp?.getTime() ?? 0) + TZ_OFFSET ?? Date.now()
       )?.toLocaleString("en-AU", {
         day: "2-digit",
         month: "2-digit",
@@ -98,7 +102,7 @@ export async function createXeroDataObject(logPath: string) {
       }
     }
   }
-  return { invoices, credits }
+  return { invoices, credits, fileAttachments }
 }
 
 /**

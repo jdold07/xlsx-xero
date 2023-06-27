@@ -1,8 +1,13 @@
-import { constants, promises, writeFileSync } from "fs"
+import { constants, createReadStream, promises, writeFileSync } from "fs"
 import { TokenSet } from "xero-node"
 import { fetchChargesfromDB } from "./dbQueries"
 import { parseXlsxFiles } from "./parseXlsx"
-import { ChargesAndPaymentsObjArrOBJ, SendToXeroResponse, TradingTerms } from "./types"
+import {
+  ChargesAndPaymentsObjArrOBJ,
+  TradingTerms,
+  XeroResponseCreateAttachments,
+  XeroResponseCreateInvoices,
+} from "./types"
 
 const logName = new Date().toISOString().slice(0, 10)
 const TZ = process.env?.TZ ? +process.env.TZ : 10
@@ -61,20 +66,56 @@ export async function alreadyExistsLogFile(logFile: string, attempt = 0): Promis
 }
 
 /**
+ * *|| CREATE FILE ATTACHMENT OBJECT OF EXCEL DD FILE ||*
+ * Creates a file attachment object for the Xero API from the excel file
+ * @param {string} filePath - The path of the excel file to create the file attachment object from
+ * @returns {Promise<{ fileName: string; mimeType: string; content: string }>} - The file attachment object
+ */
+export async function createFileAttachment(date: Date) {
+  if (!process.env?.XERO_INPUT_PATH) throw new Error("XERO_INPUT_PATH environment variable is not set")
+  const fileName = `DD ${date.getDate().toString().padStart(2, "0")}.xls`
+  const filePath = process.env.XERO_INPUT_PATH
+  const file = createReadStream(`${filePath}/${fileName}`)
+  return { date, fileName, content: file, mimeType: "application/vnd.ms-excel" }
+}
+
+/**
  * *|| FILE WRITES ||*
  * Writes the response from the Xero API to a log file
- * @param {SendToXeroResponse} invRes - The response from the Xero API for the invoiceData
- * @param {SendToXeroResponse} crRes - The response from the Xero API for the creditData
+ * @param {XeroResponseCreateInvoices} invRes - The response from the Xero API for the invoiceData
+ * @param {XeroResponseCreateInvoices} crRes - The response from the Xero API for the creditData
  * @param {string} logPath - The path of the directory to store log files for the given entity
  * @returns {Promise<void>}
  */
-export async function writeResponseLog(invRes: SendToXeroResponse, crRes: SendToXeroResponse, logPath: string) {
+export async function writeResponseLog(
+  invRes: XeroResponseCreateInvoices,
+  crRes: XeroResponseCreateInvoices,
+  logPath: string
+) {
   for (const res of [invRes, crRes]) {
     if (res) {
       const fileName = alreadyExistsLogFile(`${logPath}/res-${logName}.json`)
       writeFileSync(await fileName, JSON.stringify(res, null, 2))
     }
+    return
   }
+}
+
+/**
+ * *|| FILE WRITES ||*
+ * Writes the response for Create Invoice File Attachments from the Xero API to a log file
+ * @param {XeroResponseCreateAttachments} fileRes - The response from the Xero API for the invoiceData
+ * @param {string} logPath - The path of the directory to store log files for the given entity
+ * @returns {Promise<void>}
+ */
+export async function writeAttachmentLog(
+  fileRes: XeroResponseCreateAttachments,
+  logPath: string,
+  initFileName: string
+) {
+  const fileName = alreadyExistsLogFile(`${logPath}/${initFileName}`)
+  writeFileSync(await fileName, JSON.stringify(fileRes, null, 2))
+  return
 }
 
 /**
@@ -122,6 +163,7 @@ export async function writeRequestLog(data: ChargesAndPaymentsObjArrOBJ[], logPa
     writeFileSync(await fileName, JSON.stringify(data, null, 2))
     console.log("XLSX data written to JSON invoiceData file.")
   }
+  return
 }
 
 /**

@@ -125,7 +125,7 @@ export async function fetchDDInvoiceData(date: string | Date) {
         .map(
           (v) =>
             `${v.terminalId}/${v.seqNo} - ${new Date(
-              (v.tranTimeStamp?.getTime() ?? 0) - TZ_OFFSET ?? Date.now()
+              (v.tranTimeStamp?.getTime() ?? 0) + TZ_OFFSET ?? Date.now()
             )?.toLocaleString("en-AU", {
               day: "2-digit",
               month: "2-digit",

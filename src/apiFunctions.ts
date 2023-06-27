@@ -1,6 +1,6 @@
 import { CreditNotes, Invoices, TokenSet, XeroClient } from "xero-node"
-import { writeTokenSetJson } from "./helpers"
-import { SendToXeroResponse } from "./types"
+import { writeAttachmentLog, writeTokenSetJson } from "./helpers"
+import { FileAttachment, XeroResponseCreateInvoices } from "./types"
 
 const client_id = process.env.XERO_CLIENT_ID ?? ""
 const client_secret = process.env.XERO_CLIENT_SECRET ?? ""
@@ -53,7 +53,7 @@ export async function setActiveTenant(index: number, xero: XeroClient): Promise<
  * - Returns the response.
  * @param {CreditNotes?} creditData optional
  * @param {Invoices?} invData optional
- * @returns {SendToXeroResponse} { invRes, crRes }
+ * @returns {XeroResponseCreateInvoices} { invRes, crRes }
  */
 export async function sendInvOrCRToXero(
   invData: Invoices = { invoices: [] },
@@ -62,8 +62,8 @@ export async function sendInvOrCRToXero(
   activeTenantId: string
 ) {
   try {
-    let invRes = {} as SendToXeroResponse
-    let crRes = {} as SendToXeroResponse
+    let invRes = {} as XeroResponseCreateInvoices
+    let crRes = {} as XeroResponseCreateInvoices
 
     if (invData.invoices?.length) {
       invRes = await xero.accountingApi.createInvoices(activeTenantId, invData, false, 2)
@@ -77,4 +77,95 @@ export async function sendInvOrCRToXero(
     console.error(error?.message ?? JSON.stringify(error))
     throw new Error(error?.message ?? JSON.stringify(error))
   }
+}
+
+/**
+ * *Send file attachments to Xero API*
+ * - Looks up the invoiceId for each file attachment.
+ * - Sends file attachments request to the Xero API.
+ * - Returns the response.
+ * @param {FileAttachments} fileAttachments
+ * @returns {Promise<XeroResponseCreateInvoices>} { fileRes }
+ */
+export async function sendFileAttachmentsToXero(
+  fileAttachments: FileAttachment[],
+  xero: XeroClient,
+  activeTenantId: string,
+  logPath: string
+) {
+  try {
+    for (const fileAttachment of fileAttachments) {
+      const invoiceID = await fetchInvoiceID(fileAttachment.date, xero, activeTenantId)
+      if (!invoiceID) {
+        console.error("Unable to retrieve an invoiceID for the file attachment.  No file attachment has been uploaded!")
+        continue
+      }
+
+      const fileRes = await xero.accountingApi.createInvoiceAttachmentByFileName(
+        activeTenantId,
+        invoiceID,
+        fileAttachment.fileName,
+        fileAttachment.content
+      )
+
+      //TODO - add error checking & logging on Xero response
+      await writeAttachmentLog(fileRes, logPath, `fileRes-DD${fileAttachment.date.toISOString().slice(0, 10)}.json`)
+      return
+    }
+  } catch (error: unknown) {
+    console.error(error instanceof Error ? error?.message : JSON.stringify(error, null, 2))
+    throw new Error(error instanceof Error ? error?.message : JSON.stringify(error, null, 2))
+  }
+}
+
+/**
+ * *Fetch InvoiceID for DD Invoice from Xero API*
+ * - Send request to Xero API to get Invoice details.
+ * - Returns the InvoiceID.
+ * @param {Date} date
+ * @param {XeroClient} xero
+ * @param {string} activeTenantId
+ * @returns {Promise<string>} invoiceID
+ */
+export async function fetchInvoiceID(date: Date, xero: XeroClient, activeTenantId: string) {
+  const where = `Contact.Name=="Day Dockets"&&DateString=="${date.toISOString().slice(0, 19)}"`
+  const invoicesResult = await xero.accountingApi.getInvoices(
+    activeTenantId,
+    date,
+    where,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    ["SUBMITTED"],
+    undefined,
+    undefined,
+    true,
+    undefined,
+    false
+  )
+
+  if (!invoicesResult.body.invoices?.length) {
+    console.error(`No invoices found for the file attachment dated ${date.toISOString().slice(0, 10)}`)
+    console.error(JSON.stringify(invoicesResult, null, 2))
+    return undefined
+  }
+
+  if (invoicesResult.body.invoices?.length > 1) {
+    console.error(
+      `Found more than 1 matching invoice for the file attachment dated ${date
+        .toISOString()
+        .slice(0, 10)}.  The file attachment has NOT been uploaded!`
+    )
+    console.error(JSON.stringify(invoicesResult, null, 2))
+    return undefined
+  }
+
+  const invoiceID = invoicesResult.body.invoices[0]?.invoiceID
+  if (!invoiceID) {
+    console.error(`No invoiceID found for the file attachment dated ${date.toISOString().slice(0, 10)}`)
+    console.error(JSON.stringify(invoicesResult, null, 2))
+    return undefined
+  }
+  return invoiceID
 }

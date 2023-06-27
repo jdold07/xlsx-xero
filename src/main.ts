@@ -1,5 +1,5 @@
 import { TokenSet, XeroClient } from "xero-node"
-import { refreshTokenSet, sendInvOrCRToXero, setActiveTenant } from "./apiFunctions"
+import { refreshTokenSet, sendFileAttachmentsToXero, sendInvOrCRToXero, setActiveTenant } from "./apiFunctions"
 import { createXeroDataObject } from "./createXeroDataObject"
 import { getLogPath, getTenantIndex, writeResponseLog } from "./helpers"
 import storedToken from "./lib/tokenSet.json"
@@ -17,7 +17,7 @@ async function main(entity: string) {
     xero = await refreshTokenSet(tokenSet)
     const activeTenantId = await setActiveTenant(tenantIndex, xero)
 
-    const { invoices, credits } = await createXeroDataObject(logPath)
+    const { invoices, credits, fileAttachments } = await createXeroDataObject(logPath)
     console.log("Xero Invoice Objects created")
 
     const { invRes, crRes } = await sendInvOrCRToXero(invoices, credits, xero, activeTenantId)
@@ -25,12 +25,16 @@ async function main(entity: string) {
 
     //TODO - add error checking & logging on Xero response
 
-    writeResponseLog(invRes, crRes, logPath)
+    await writeResponseLog(invRes, crRes, logPath)
     console.log("Invoices have been sent to Xero.")
+
+    await sendFileAttachmentsToXero(fileAttachments, xero, activeTenantId, logPath)
+    console.log("DD File attachments have been uploaded and attached to DD invoices")
+
     process.exitCode = 0
     return
   } catch (err) {
-    console.log(err)
+    console.error(err, null, 2)
     process.exitCode = 1
   }
 }
