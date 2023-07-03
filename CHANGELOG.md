@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/jdold07/xlsx-xero/compare/v0.3.1...v0.3.2) (2023-07-03)
+
+
+### Features
+
+* ✨ update DD invoice to handle lotto payouts ([302a7f9](https://github.com/jdold07/xlsx-xero/commit/302a7f9da3ddc166a6ce9c86f8260cbae9c5f8db))
+
 ### [0.3.1](https://github.com/jdold07/xlsx-xero/compare/v0.3.0...v0.3.1) (2023-07-03)
 
 ## [0.3.0](https://github.com/jdold07/xlsx-xero/compare/v0.2.0...v0.3.0) (2023-06-27)
