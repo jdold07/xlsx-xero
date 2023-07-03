@@ -67,6 +67,8 @@ export async function fetchDDInvoiceData(date: string | Date) {
           totalCheques: true,
           totalEFTPOS: true,
           totalAccountSales: true,
+          totalPayoutInstants: true,
+          totalPayoutLotto: true,
           totalGst: true,
         },
       }),

@@ -118,7 +118,9 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
   const meat = data.deptSales.find((d) => d.department.deptDisplayName === "Meat")
   const takeaway = data.deptSales.find((d) => d.department.deptDisplayName === "Take-away")
   const cigs = data.deptSales.find((d) => d.department.deptDisplayName === "Cigarettes & Tobacco")
-  const depts = [produce, deli, bakery, meat, takeaway, cigs]
+  const instants = data.deptSales.find((d) => d.department.deptDisplayName === "Scratchies")
+  const lotto = data.deptSales.find((d) => d.department.deptDisplayName === "Lotto")
+  const depts = [produce, deli, bakery, meat, takeaway, cigs, instants, lotto]
   const deptsToInclude = depts.filter((d) => d !== undefined)
   const deptSalesLineItems = deptsToInclude.map((d) => ({
     description: `${d?.department.deptDisplayName} Department Sales`,
@@ -191,5 +193,26 @@ export async function createDDInvoice(date: Date, tillVariance: number) {
       },
     ],
   }
+  if (process.argv[2] === "wb" && ddInv.lineItems && ddInv.lineItems.length > 1) {
+    const expLineItem = ddInv.lineItems.pop()
+    ddInv.lineItems.push({
+      description: "Instant Scratchies Cash Payouts",
+      quantity: 1,
+      unitAmount: +(data.totalPayoutInstants ?? 0) * -1,
+      taxAmount: 0,
+      accountCode: "51350",
+      taxType: "BASEXCLUDED",
+    })
+    ddInv.lineItems.push({
+      description: "Lotto Cash Payouts",
+      quantity: 1,
+      unitAmount: +(data.totalPayoutLotto ?? 0) * -1,
+      taxAmount: 0,
+      accountCode: "51350",
+      taxType: "BASEXCLUDED",
+    })
+    if (expLineItem) ddInv.lineItems.push(expLineItem)
+  }
+
   return ddInv
 }
